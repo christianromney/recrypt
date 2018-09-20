@@ -21,11 +21,11 @@
   using a secure random number generator from the
   Crypto API, if supported by the browser."
   []
-  (if-not js.window.crypto
-    (clj->js (random-bytes 16))
+  (if-let [crypt (or js/window.crypto js/window.msCrypto)]
     (let [arr (js/Uint8Array. 16)]
-      (js/window.crypto.getRandomValues arr)
-      arr)))
+      (.getRandomValues crypt arr)
+      arr)
+    (clj->js (random-bytes 16))))
 
 (defn encrypt-bytes
   "Wraps geheimnis encrypt (goog.crypt.Aes), requiring an explicit IV"
